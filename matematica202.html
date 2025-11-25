@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Turma 202 — Instrumentos Africanos e Matemática</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#06060a;--panel:#0f1114;--accent:#ffd86b;--muted:#9a9a9a;--glass:rgba(255,255,255,0.03)}
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Poppins,system-ui,Segoe UI,Roboto}
+  html,body{height:100%}
+  body{background:linear-gradient(180deg,#050505,#0b0b0b);color:#fff;padding:18px}
+  .wrap{max-width:1200px;margin:0 auto;gap:18px;display:grid}
+  header{padding:20px;border-radius:12px;background-image:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.55)),url('https://images.unsplash.com/photo-1543062094-7d82e1e92e84?auto=format&fit=crop&w=1400&q=60');background-size:cover;background-position:center;color:#fff;margin-bottom:14px}
+  header h1{font-size:24px;color:var(--accent);letter-spacing:0.4px}
+  header p{color:#e6e6e6;opacity:.95;margin-top:6px}
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
+  .card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  .section{margin-bottom:12px;color:var(--accent);font-weight:700}
+  input,select,button,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.03);background:#0b0b0b;color:#fff}
+  .row{display:flex;gap:10px}
+  .row > *{flex:1}
+  .small{font-size:13px;color:var(--muted)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+  .memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+  .memory-card{background:#0a0a0a;padding:18px;border-radius:10px;text-align:center;cursor:pointer;user-select:none;font-weight:700;color:#fff;transition:transform .18s,background .18s}
+  .memory-card.revealed{background:var(--accent);color:#111;transform:scale(1.02)}
+  .quiz-option{background:#0b0b0b;padding:12px;border-radius:10px;margin-top:8px;cursor:pointer;border:1px solid rgba(255,255,255,.03);transition:transform .12s}
+  .quiz-option:hover{transform:translateX(6px)}
+  .meta{display:flex;justify-content:space-between;align-items:center}
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+  .badge{background:rgba(255,216,107,.12);color:var(--accent);padding:6px 10px;border-radius:999px;font-weight:700}
+  .controls{display:flex;gap:8px}
+  .muted-box{background:var(--glass);padding:10px;border-radius:8px;color:var(--muted)}
+  @media(max-width:980px){.grid{grid-template-columns:1fr}.memory-grid{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Instrumentos Africanos na Matemática — Turma 202 👻</h1>
+      <p class="small">Dinâmicas, jogos e desafios para aprender combinatória e aritmética de forma divertida.</p>
+    </header>
+
+    <div class="grid">
+      <!-- principal -->
+      <div>
+        <div class="card">
+          <div class="section">Catálogo de Instrumentos</div>
+          <div class="small">Referências usadas nas dinâmicas — clique em um item para ver detalhes.</div>
+          <div style="margin-top:12px" id="catalog" class="cards"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section">Calculadora Combinatória & Desafio</div>
+          <div class="small">Use a calculadora ou aceite um desafio gerado automaticamente para ganhar pontos.</div>
+          <label class="small" style="margin-top:8px">Número total de objetos (n)</label>
+          <input id="n" type="number" min="0" placeholder="Ex: 8">
+          <label class="small" style="margin-top:8px">Tamanho da seleção (k)</label>
+          <input id="k" type="number" min="0" placeholder="Ex: 3">
+          <label class="small" style="margin-top:8px">Tipo</label>
+          <select id="tipo">
+            <option value="perm">Permutação (n!)</option>
+            <option value="arr">Arranjo (P(n,k))</option>
+            <option value="comb">Combinação (C(n,k))</option>
+          </select>
+          <div class="row" style="margin-top:10px">
+            <button id="calcBtn">Calcular</button>
+            <button id="genChallenge">Gerar Desafio</button>
+          </div>
+          <div id="calcResult" style="margin-top:10px;background:#070707;padding:12px;border-radius:10px;color:#eaeaea"></div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section">Relâmpago Matemático — 60s</div>
+          <div id="relayQuestion" style="font-weight:700;margin-bottom:8px">Clique em Iniciar</div>
+          <div class="row" style="align-items:center">
+            <input id="relayAnswer" placeholder="Resposta (Enter para enviar)">
+            <button id="startRelay">Iniciar</button>
+          </div>
+          <div style="margin-top:8px" class="meta small">Tempo: <span id="relayTimer">60</span>s • Acertos: <span id="relayHits">0</span></div>
+          <div style="margin-top:8px" class="small">Dificuldade ajusta automaticamente: perguntas mistas de aritmética e combinatória.</div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section">Jogo da Memória — Melhorado</div>
+          <div class="small">Movimentos: <span id="memMoves">0</span> • Acertos: <span id="memMatches">0</span></div>
+          <div style="margin-top:8px" class="small">Dica: quanto menos movimentos, mais pontos.</div>
+          <div class="memory-grid" id="memoria" aria-live="polite"></div>
+          <div style="margin-top:10px" class="row">
+            <button id="resetMem">Reiniciar</button>
+            <select id="memLevel" style="width:38%">
+              <option value="easy">Fácil (4 pares)</option>
+              <option value="medium">Médio (6 pares)</option>
+              <option value="hard">Difícil (8 pares)</option>
+              <option value="insane">Insano (12 pares)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section">Quiz Rápido — Expandido</div>
+          <div id="quizQ" style="font-weight:700">Clique em "Nova"</div>
+          <div id="quizOps"></div>
+          <div style="margin-top:8px" class="row">
+            <button id="newQuiz">Nova</button>
+            <button id="showAns">Mostrar resposta</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section">Desafio de Cálculos</div>
+          <div class="small">Escolha entre resolver uma expressão ou um problema combinatório gerado.</div>
+          <select id="challengeType">
+            <option value="expr">Expressão aleatória</option>
+            <option value="comb">Problema combinatório</option>
+          </select>
+          <div style="margin-top:8px" class="row">
+            <button id="genCalcChallenge">Gerar</button>
+            <button id="submitCalc">Enviar resposta</button>
+          </div>
+          <input id="calcChallengeInput" placeholder="Digite a resposta aqui">
+          <div id="calcChallengeBox" style="margin-top:10px" class="muted-box">Sem desafio gerado.</div>
+        </div>
+
+      </div>
+
+      <!-- lateral -->
+      <div>
+        <div class="card">
+          <div class="section">Placar Rápido</div>
+          <div class="small">Pontos: <span id="points">0</span></div>
+          <div style="margin-top:8px" class="row">
+            <button id="save">Salvar</button>
+            <button id="clear">Limpar</button>
+          </div>
+          <div style="margin-top:12px" class="small">Top histórico (local)</div>
+          <div id="leaderboard" style="margin-top:8px" class="muted-box">— vazio —</div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section">Sobre</div>
+          <div class="small">Desenvolvido pela turma 202 🥺🐕</div>
+          <div style="margin-top:10px"><span class="badge">😭✨</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer>Trabalho — Matemática 🙏🏼</footer>
+  </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const $ = id => document.getElementById(id);
+
+  // util: factorial usando BigInt
+  function fatBig(n){
+    if(n < 0) return null;
+    let r = 1n;
+    for(let i=2n;i<=BigInt(n);i++) r *= i;
+    return r;
+  }
+  function formatBig(x){
+    if(typeof x === 'bigint'){
+      const s = x.toString();
+      return s.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+    return Number(x).toLocaleString('pt-BR');
+  }
+
+  // catálogo
+  const instruments = [
+    {id:'djembe', name:'Djembê', desc:'Tambor de origem oeste-africana, percussão principal.'},
+    {id:'kora', name:'Kora', desc:'Harpa-lá no estilo africano. Instrumento de cordas.'},
+    {id:'mbira', name:'Mbira', desc:'Lamellophone (sanza). Instrumento de lamelas.'},
+    {id:'atabaque', name:'Atabaque', desc:'Tambor usado em rituais e música popular.'},
+    {id:'berimbau', name:'Berimbau', desc:'Instrumento brasileiro com origem africana, usado na capoeira.'},
+    {id:'agogô', name:'Agogô', desc:'Instrumento de percussão metálico de origem africana.'},
+    {id:'shekere', name:'Shekere', desc:'Instrumento de percussão com contas sobre uma cabaça.'},
+    {id:'tam-tam', name:'TamTam', desc:'Grande gongue, utilizado em contextos cerimoniais.'}
+  ];
+
+  function renderCatalog(){
+    const wrap = $('catalog'); wrap.innerHTML='';
+    instruments.forEach(i=>{
+      const d = document.createElement('div');
+      d.className='card-item';
+      d.style.padding='12px'; d.style.background='#070707'; d.style.borderRadius='10px'; d.style.cursor='pointer';
+      d.innerHTML = `<div style="font-weight:700;color:var(--accent)">${i.name}</div><div class="small">Clique para detalhes</div>`;
+      d.addEventListener('click', ()=> showModal(i.name, i.desc));
+      wrap.appendChild(d);
+    });
+  }
+
+  function showModal(title, text){
+    alert(title + '\n\n' + text);
+  }
+  renderCatalog();
+
+  // ---------------- calculadora ----------------
+  $('calcBtn').addEventListener('click', ()=>{
+    const n = Number($('n').value);
+    const k = Number($('k').value);
+    const tipo = $('tipo').value;
+    if(!Number.isFinite(n) || n<0 || (tipo!=='perm' && (!Number.isFinite(k) || k<0)) || (tipo!=='perm' && k>n)){
+      $('calcResult').innerText = '❌ Preencha valores válidos (0 ≤ k ≤ n).';
+      return;
+    }
+    try{
+      let res;
+      if(tipo === 'perm'){
+        const f = fatBig(n);
+        res = f;
+      } else if(tipo === 'arr'){
+        const num = fatBig(n);
+        const den = fatBig(n-k);
+        res = num / den;
+      } else if(tipo === 'comb'){
+        const num = fatBig(n);
+        const den = fatBig(k) * fatBig(n-k);
+        res = num / den;
+      }
+      $('calcResult').innerText = `Resultado: ${formatBig(res)}`;
+    } catch(err){
+      $('calcResult').innerText = 'Erro no cálculo — verifique os valores.';
+    }
+  });
+
+  // challenge generator for combinatorial problems
+  function genCombChallenge(){
+    const n = Math.floor(Math.random()*10)+5; // 5..14
+    const k = Math.floor(Math.random()*(n-1))+1;
+    const type = (Math.random()<0.6)? 'arr' : 'comb';
+    const q = (type==='arr')? `Arranjo P(${n},${k}) = ?` : `Combinação C(${n},${k}) = ?`;
+    const ans = (type==='arr')? fatBig(n)/fatBig(n-k) : fatBig(n)/(fatBig(k)*fatBig(n-k));
+    return {q, ans};
+  }
+
+  // ---------------- relâmpago ----------------
+  let relayTimer = null, relaySeconds = 60, relayHits = 0, relayCurrent = null;
+  function safeOp(a,op,b){
+    a = Number(a); b = Number(b);
+    if(!Number.isFinite(a) || !Number.isFinite(b)) return null;
+    if(op === '+') return a+b;
+    if(op === '-') return a-b;
+    if(op === '*' || op === '×' || op === 'x') return a*b;
+    if(op === '/') return (b===0?null:a/b);
+    return null;
+  }
+  function genRelay(){
+    const t = Math.random();
+    if(t < 0.45){
+      const a = Math.floor(Math.random()*90)+1;
+      const b = Math.floor(Math.random()*90)+1;
+      const ops = ['+','-','*','×','/'];
+      const op = ops[Math.floor(Math.random()*ops.length)];
+      const q = `${a} ${op} ${b}`;
+      let ans = safeOp(a,op,b);
+      if(op === '/') ans = Math.round((ans + Number.EPSILON)*100)/100;
+      return {q, ans};
+    } else if(t < 0.85){
+      const n = Math.floor(Math.random()*9)+4;
+      const k = Math.floor(Math.random()*(n-1))+1;
+      if(Math.random() < 0.6) return {q:`Arranjo P(${n},${k}) = ?`, ans: Number(fatBig(n)/fatBig(n-k))};
+      return {q:`Combinação C(${n},${k}) = ?`, ans: Number(fatBig(n)/(fatBig(k)*fatBig(n-k)))};
+    } else {
+      const a = Math.floor(Math.random()*900)+100;
+      const b = Math.floor(Math.random()*9)+2;
+      return {q:`${a} × ${b}`, ans: a*b};
+    }
+  }
+  function updateRelayUI(){
+    $('relayTimer').innerText = relaySeconds;
+    $('relayHits').innerText = relayHits;
+  }
+  $('startRelay').addEventListener('click', ()=>{
+    if(relayTimer) return;
+    relaySeconds = 60; relayHits = 0; updateRelayUI();
+    relayCurrent = genRelay(); $('relayQuestion').innerText = relayCurrent.q;
+    $('relayAnswer').value = '';
+    relayTimer = setInterval(()=>{
+      relaySeconds--;
+      updateRelayUI();
+      if(relaySeconds <= 0){
+        clearInterval(relayTimer); relayTimer = null;
+        $('relayQuestion').innerText = `Tempo esgotado — Acertos: ${relayHits}`;
+      }
+    }, 1000);
+  });
+  $('relayAnswer').addEventListener('keydown', (e)=>{
+    if(e.key !== 'Enter') return;
+    if(!relayCurrent) return;
+    const val = $('relayAnswer').value.trim();
+    if(val === '') { $('relayAnswer').value = ''; return; }
+    const numericVal = Number(val.replace(',','.'));
+    const correct = relayCurrent.ans;
+    const ok = Number.isFinite(numericVal) && (Math.abs(numericVal - correct) < 1e-6);
+    if(ok){ relayHits++; addPoints(3); }
+    else { addPoints(-1); }
+    relayCurrent = genRelay(); $('relayQuestion').innerText = relayCurrent.q; $('relayAnswer').value=''; updateRelayUI();
+  });
+
+  // ---------------- memória ----------------
+  let memFirst = null, memLock = false, memMoves = 0, memMatches = 0, memPairs = 4, memStartTime = null;
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+  function buildMemory(level='easy'){
+    const poolBase = ['Djembê','Kora','Mbira','Atabaque','Berimbau','Agogô','Shekere','TamTam','Udu','Balafon','Kalimba','Dundun'];
+    if(level==='easy') memPairs = 4;
+    else if(level==='medium') memPairs = 6;
+    else if(level==='hard') memPairs = 8;
+    else if(level==='insane') memPairs = 12;
+    const pool = poolBase.slice(0,memPairs);
+    let deck = [...pool, ...pool]; deck = shuffle(deck);
+    const grid = $('memoria'); grid.innerHTML=''; memFirst=null; memLock=false; memMoves=0; memMatches=0; memStartTime = Date.now();
+    deck.forEach(v=>{
+      const d = document.createElement('div');
+      d.className='memory-card'; d.dataset.val=v; d.innerText='?';
+      d.addEventListener('click', ()=>{
+        if(memLock || d.classList.contains('revealed')) return;
+        d.classList.add('revealed'); d.innerText = d.dataset.val;
+        if(!memFirst){ memFirst=d; return; }
+        memMoves++; $('memMoves').innerText = memMoves;
+        if(memFirst.dataset.val === d.dataset.val){
+          memMatches++; $('memMatches').innerText = memMatches;
+          memFirst = null;
+          if(memMatches === memPairs){
+            const elapsed = Math.max(1, Math.floor((Date.now()-memStartTime)/1000));
+            const base = Math.max(10, memPairs*10);
+            const points = Math.max(5, Math.round(base + Math.max(0, (memPairs*20 - memMoves)) + Math.max(0, (60 - elapsed)/2)));
+            addPoints(points);
+            setTimeout(()=> alert('Você venceu o jogo da memória! Pontos ganhos: ' + points), 200);
+          }
+        } else {
+          memLock = true;
+          setTimeout(()=>{
+            memFirst.classList.remove('revealed'); memFirst.innerText='?';
+            d.classList.remove('revealed'); d.innerText='?'; memFirst=null; memLock=false;
+          }, 700);
+        }
+      });
+      grid.appendChild(d);
+    });
+    $('memMoves').innerText = memMoves; $('memMatches').innerText = memMatches;
+  }
+  $('resetMem').addEventListener('click', ()=> buildMemory($('memLevel').value));
+  $('memLevel').addEventListener('change', ()=> buildMemory($('memLevel').value));
+  buildMemory('easy');
+
+  // ---------------- quiz ----------------
+  const quizBank = [
+    {q:'Qual instrumento é tradicionalmente usado na capoeira?', ops:['Djembê','Berimbau','Mbira'], a:1},
+    {q:'Qual o valor de 4! (fatorial de 4)?', ops:['24','12','16'], a:0},
+    {q:'Mbira é um instrumento do tipo:', ops:['Cordas','Lamellophone','Sopro'], a:1},
+    {q:'Arranjo P(5,2) vale:', ops:['20','10','5'], a:0},
+    {q:'Kora é um instrumento de:', ops:['Cordas','Percussão','Sopro'], a:0},
+    {q:'Combinação C(5,2) é igual a:', ops:['10','20','5'], a:0},
+    {q:'Qual destes é um instrumento de percussão?', ops:['Kora','Mbira','Atabaque'], a:2},
+    {q:'Qual o valor de 6!?', ops:['720','360','120'], a:0},
+    {q:'C(7,3) é:', ops:['35','21','28'], a:0},
+    {q:'P(6,3) é:', ops:['120','720','48'], a:0},
+    {q:'O que é uma permutação?', ops:['Seleção sem ordem','Ordenação de todos os objetos','Arranjo com repetição'], a:1},
+    {q:'Qual instrumento é de lamelas?', ops:['Berimbau','Mbira','Kora'], a:1},
+    {q:'Qual é 8 × 7?', ops:['56','48','64'], a:0},
+    {q:'Qual é o fatorial de 5?', ops:['120','60','24'], a:0},
+    {q:'C(8,2) é:', ops:['28','56','32'], a:0},
+    {q:'P(5,5) é:', ops:['120','24','720'], a:0},
+    {q:'Que instrumento tem formato de cabaça com contas?', ops:['Shekere','Agogô','Djembe'], a:0},
+    {q:'Qual o valor de 9 ÷ 3?', ops:['3','6','9'], a:0},
+    {q:'Combinação C(10,1) é:', ops:['10','1','0'], a:0},
+    {q:'P(4,2) é:', ops:['12','8','6'], a:0},
+    {q:'Qual é 15 + 25?', ops:['40','30','50'], a:0},
+    {q:'Qual instrumento é tocado como harpa?', ops:['Kora','Mbira','Berimbau'], a:0},
+    {q:'C(6,3) é:', ops:['20','15','10'], a:1},
+    {q:'Qual é 7 × 6?', ops:['42','36','48'], a:0},
+    {q:'Qual destes NÃO é percussão?', ops:['Atabaque','Kora','Agogô'], a:1}
+  ];
+
+  let currentQuiz = null;
+  function newQuiz(){
+    currentQuiz = quizBank[Math.floor(Math.random()*quizBank.length)];
+    $('quizQ').innerText = currentQuiz.q; const wrap = $('quizOps'); wrap.innerHTML='';
+    // embaralhar ops mantendo referência à correta
+    const ops = currentQuiz.ops.map((t,i)=>({t,i}));
+    shuffle(ops);
+    ops.forEach(o=>{
+      const d = document.createElement('div'); d.className='quiz-option'; d.innerText = o.t;
+      d.addEventListener('click', ()=>{
+        const correctText = currentQuiz.ops[currentQuiz.a];
+        if(o.t === correctText){ d.style.outline='3px solid rgba(0,200,120,.9)'; addPoints(5); }
+        else { d.style.outline='3px solid rgba(200,40,40,.9)'; addPoints(-1); }
+        // bloquear futuras escolhas
+        Array.from(wrap.children).forEach(ch=> ch.style.pointerEvents='none');
+      });
+      wrap.appendChild(d);
+    });
+  }
+  $('newQuiz').addEventListener('click', newQuiz);
+  $('showAns').addEventListener('click', ()=>{
+    if(!currentQuiz) return;
+    const correct = currentQuiz.ops[currentQuiz.a];
+    Array.from($('quizOps').children).forEach(ch=>{ if(ch.innerText === correct) ch.style.outline='3px solid rgba(0,200,120,.9)'; });
+  });
+  newQuiz();
+
+  // ---------------- Desafio de Cálculos ----------------
+  let calcChallenge = null;
+  function genExpression(){
+    const ops = ['+','-','*','/','×'];
+    const a = Math.floor(Math.random()*90)+1;
+    const b = Math.floor(Math.random()*90)+1;
+    const op = ops[Math.floor(Math.random()*ops.length)];
+    let q = `${a} ${op} ${b}`;
+    let ans = safeOp(a, op, b);
+    if(op === '/' || op === '×') ans = Math.round((ans + Number.EPSILON)*100)/100;
+    return {q, ans};
+  }
+  $('genCalcChallenge').addEventListener('click', ()=>{
+    const t = $('challengeType').value;
+    if(t === 'expr'){
+      calcChallenge = genExpression();
+      $('calcChallengeBox').innerText = `Resolva: ${calcChallenge.q}`;
+    } else {
+      calcChallenge = genCombChallenge();
+      $('calcChallengeBox').innerText = `Resolva: ${calcChallenge.q}`;
+    }
+  });
+  $('submitCalc').addEventListener('click', ()=>{
+    if(!calcChallenge){ alert('Gere um desafio primeiro.'); return; }
+    const ans = Number($('calcChallengeInput').value.replace(',','.'));
+    if(!Number.isFinite(ans)){ alert('Resposta inválida'); return; }
+    const correct = Number(calcChallenge.ans);
+    if(Math.abs(ans - correct) < 1e-6){ addPoints(10); alert('Resposta correta! +10 pontos'); }
+    else { addPoints(-2); alert('Incorreto. -2 pontos. Resposta certa: ' + String(correct)); }
+    calcChallenge = null; $('calcChallengeBox').innerText = 'Sem desafio gerado.'; $('calcChallengeInput').value='';
+  });
+
+  // ---------------- placar ----------------
+  function getPoints(){ return Number(localStorage.getItem('points202')||0); }
+  function setPoints(v){ localStorage.setItem('points202', String(v)); $('points').innerText = v; }
+  function addPoints(v){ const p = Math.max(0, getPoints() + v); setPoints(p); saveToLeaderboard(p); }
+  $('save').addEventListener('click', ()=>{ alert('Progresso salvo localmente'); setPoints(getPoints()); renderLeaderboard(); });
+  $('clear').addEventListener('click', ()=>{ if(confirm('Limpar pontos salvos?')){ localStorage.removeItem('points202'); setPoints(0); renderLeaderboard(); } });
+  $('points').innerText = getPoints();
+
+  // leaderboard local simples (armazena últimos 8 scores)
+  function saveToLeaderboard(score){
+    const key = 'leader202';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    if(score<=0) return;
+    list.unshift({ts:Date.now(),score});
+    const trimmed = list.slice(0,8);
+    localStorage.setItem(key, JSON.stringify(trimmed));
+    renderLeaderboard();
+  }
+  function renderLeaderboard(){
+    const key = 'leader202';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    const box = $('leaderboard'); box.innerHTML='';
+    if(list.length===0) box.innerText='— vazio —';
+    else{
+      list.forEach((it,idx)=>{
+        const d = document.createElement('div'); d.style.padding='6px 8px'; d.style.borderBottom='1px solid rgba(255,255,255,.02)'; d.innerText = `${idx+1}. ${it.score} pts — ${new Date(it.ts).toLocaleString()}`;
+        box.appendChild(d);
+      });
+    }
+  }
+  renderLeaderboard();
+
+  // proteger erros simples
+  window.addEventListener('error', e => console.log('Erro capturado:', e.message));
+
+});
+</script>
+</body>
+</html>
